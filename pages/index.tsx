@@ -1,12 +1,13 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import FlexpaLink from '@flexpa/link'
 
 export default function Home() {
 
-  const [accessToken, setAccessToken] = useState('')
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [patientId, setPatientId] = useState("")
 
   useEffect(() => {
     // Run on client-side only
@@ -20,7 +21,7 @@ export default function Home() {
           .then(at => at && setAccessToken(at))
       }
     })
-  }, [setAccessToken])
+  }, [accessToken, setAccessToken])
 
   const getAccessToken = async (pt: string): Promise<string | undefined> => {
     // Fixme: sometimes returns a 404 error on /api/auth
@@ -35,7 +36,10 @@ export default function Home() {
     return data.data.access_token
   }
 
-  console.log({ accessToken })
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    console.log({ patientId })
+  }
 
   return (
     <div className={styles.container}>
@@ -56,7 +60,21 @@ export default function Home() {
         </p>
 
         <div className={styles.grid}>
-        <button onClick={() => FlexpaLink.open()}>Link your health data</button>
+        { accessToken ? (
+          <form onSubmit={handleSubmit}>
+            <label>
+              Enter your Patient ID:{' '}
+              <input
+                type="text"
+                name="patient-id"
+                onChange={(e) => setPatientId(e.target.value)}
+              />
+            </label>{' '}
+            <input type="submit" value="Submit" />
+          </form>
+        ) : (
+          <button onClick={() => FlexpaLink.open()}>Link your health data</button>
+        ) }
           {/* <a href="https://nextjs.org/docs" className={styles.card}>
             <h2>Documentation &rarr;</h2>
             <p>Find in-depth information about Next.js features and API.</p>
