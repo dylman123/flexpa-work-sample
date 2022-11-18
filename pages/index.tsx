@@ -6,7 +6,7 @@ import FlexpaLink from '@flexpa/link'
 
 export default function Home() {
 
-  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [accessToken, setAccessToken] = useState("")
   const [patientId, setPatientId] = useState("")
 
   useEffect(() => {
@@ -18,7 +18,10 @@ export default function Home() {
         // Send `publicToken` to your backend to exchange it for a patient `access_token`
         // https://www.flexpa.com/docs/sdk/login#exchange
         getAccessToken(publicToken)
-          .then(at => at && setAccessToken(at))
+          .then(at => {
+            at && setAccessToken(at)
+            at && getPatientId(at)
+          })
       }
     })
   }, [accessToken, setAccessToken])
@@ -34,6 +37,19 @@ export default function Home() {
     })
     const data = await response.json()
     return data.data.access_token
+  }
+
+  const getPatientId = async (at: string): Promise<string | undefined> => {
+    const response = await fetch('/api/link/introspect', {
+      method: 'POST',
+      body: JSON.stringify({ accessToken: at }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await response.json()
+    console.log({ data })
+    return data.data
   }
 
   const getExplanationOfBenefits = async (id: string) => {
@@ -76,7 +92,7 @@ export default function Home() {
         </p>
 
         <div className={styles.grid}>
-        { accessToken ? (
+        {/* { accessToken ? (
           <form onSubmit={handleSubmit}>
             <label>
               Enter your Patient ID:{' '}
@@ -88,9 +104,9 @@ export default function Home() {
             </label>{' '}
             <input type="submit" value="Submit" />
           </form>
-        ) : (
+        ) : ( */}
           <button onClick={() => FlexpaLink.open()}>Link your health data</button>
-        ) }
+        {/* ) } */}
           {/* <a href="https://nextjs.org/docs" className={styles.card}>
             <h2>Documentation &rarr;</h2>
             <p>Find in-depth information about Next.js features and API.</p>
