@@ -24,8 +24,8 @@ export default function Home() {
   }, [accessToken, setAccessToken])
 
   const getAccessToken = async (pt: string): Promise<string | undefined> => {
-    // Fixme: sometimes returns a 404 error on /api/auth
-    const response = await fetch('/api/auth', {
+    // Fixme: sometimes returns a 404 error on /api/link/exchange
+    const response = await fetch('/api/link/exchange', {
       method: 'POST',
       body: JSON.stringify({ publicToken: pt }),
       headers: {
@@ -37,7 +37,7 @@ export default function Home() {
   }
 
   const getExplanationOfBenefits = async (id: string) => {
-    const response = await fetch('/api/resources/ExplanationOfBenefit', {
+    const response = await fetch('/api/fhir/ExplanationOfBenefit', {
       method: 'POST',
       body: JSON.stringify({
         patientId: id,
