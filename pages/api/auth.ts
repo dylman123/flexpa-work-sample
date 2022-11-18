@@ -28,7 +28,7 @@ export default async function handler(
 
   res.status(await flexpaResponse.status)
 
-  if (flexpaResponse.status !== 200) {
+  if (await flexpaResponse.status !== 200) {
     // Error from Flexpa API
     res.json({ data: flexpaResponse.statusText })
   }
