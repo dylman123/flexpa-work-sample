@@ -6,7 +6,26 @@ import FlexpaLink from '@flexpa/link'
 
 export default function Home() {
 
-  const getAccessToken = async (pt: string) => {
+  const [accessToken, setAccessToken] = useState('')
+
+  useEffect(() => {
+    // Run on client-side only
+    FlexpaLink.create({
+      // Replace with your publishable key
+      publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY ?? '',
+      onSuccess: (publicToken) => {
+        // Send `publicToken` to your backend to exchange it for a patient `access_token`
+        // https://www.flexpa.com/docs/sdk/login#exchange
+        getAccessToken(publicToken)
+          .then(at => {
+            setAccessToken(at)
+          })
+      }
+    })
+  }, [setAccessToken])
+
+  const getAccessToken = async (pt: string): Promise<string> => {
+    // Fixme: sometimes returns a 404 error on /api/auth
     const response = await fetch('/api/auth', {
       method: 'POST',
       body: JSON.stringify({ publicToken: pt }),
@@ -15,22 +34,10 @@ export default function Home() {
       },
     })
     const data = await response.json()
-    const at = data.data.access_token
-    console.log({ at })
+    return data.data.access_token ?? ''
   }
 
-  useEffect(() => {
-    // Run on client-side only
-    FlexpaLink.create({
-      // Replace with your publishable key
-      publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY ?? '',
-      onSuccess: (token) => {
-        // Send `publicToken` to your backend to exchange it for a patient `access_token`
-        // https://www.flexpa.com/docs/sdk/login#exchange
-        getAccessToken(token)
-      }
-    })
-  }, [])
+  console.log({ accessToken })
 
   return (
     <div className={styles.container}>

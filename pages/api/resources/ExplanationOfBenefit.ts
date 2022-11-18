@@ -9,20 +9,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     res.status(400).json({ data: 'Invalid request method' })
   }
-  const publicToken: string = req.body.publicToken
+  const accessToken: string = req.body.acessToken
+  const patientId: string = req.body.query.patientId
 
   // Make request to Flexpa API endpoint
-  const flexpaResponse = await fetch('https://api.flexpa.com/link/exchange', {
+  const requestUrl = `https://api.flexpa.com/fhir/ExplanationOfBenefit?patient=${patientId}` 
+  const flexpaResponse = await fetch(requestUrl, {
     method: 'POST',
-    body: JSON.stringify({ 
-      'public_token': publicToken,
-      'secret_key': process.env.SECRET_KEY,
-    }),
     headers: {
-      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
     },
   })
 
