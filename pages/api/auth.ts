@@ -15,7 +15,7 @@ export default async function handler(
   const publicToken: string = req.body.publicToken
 
   // Make API request to Flexpa endpoint
-  await fetch('https://api.flexpa.com/link/exchange', {
+  const flexpaResponse = await fetch('https://api.flexpa.com/link/exchange', {
     method: 'POST',
     body: JSON.stringify({ 
       'public_token': publicToken,
@@ -25,16 +25,25 @@ export default async function handler(
       'Content-Type': 'application/json',
     },
   })
-  .then((r: Response) => {
-    res.status(r.status)
-    if (r.status !== 200) {  // Error from Flexpa API
-      res.json({ data: r.statusText })
-    } else {  // Success from Flexpa API
-      return r.json()
+
+  res.status(await flexpaResponse.status)
+
+  if (flexpaResponse.status !== 200) {
+    // Error from Flexpa API
+    res.json({ data: flexpaResponse.statusText })
+  }
+  else {
+    // Success from Flexpa API
+    try {
+      const d = await flexpaResponse.json()
+
+      // Success parsing JSON
+      res.json({ data: await d })
     }
-  })
-  .then(d => {
-    res.json({ data: d })  // Success parsing JSON
-  })
-  .catch(e => res.json({ data: e }))  // Error parsing JSON
+    catch {
+
+      // Error parsing JSON
+      res.json({ data: 'Malformed JSON in API response' })
+    }
+  }
 }
