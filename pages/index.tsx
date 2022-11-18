@@ -36,9 +36,25 @@ export default function Home() {
     return data.data.access_token
   }
 
+  const getExplanationOfBenefits = async (id: string) => {
+    const response = await fetch('/api/resources/ExplanationOfBenefit', {
+      method: 'POST',
+      body: JSON.stringify({
+        patientId: id,
+        accessToken,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await response.json()
+    console.log({ data })
+    return data
+  }
+
   const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    console.log({ patientId })
+    event.preventDefault()
+    getExplanationOfBenefits(patientId)
   }
 
   return (
