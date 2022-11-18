@@ -1,22 +1,35 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import FlexpaLink from '@flexpa/link'
 
 export default function Home() {
+
+  const getAccessToken = async (pt: string) => {
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      body: JSON.stringify({ publicToken: pt }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = await response.json()
+    const at = data.data.access_token
+    console.log({ at })
+  }
 
   useEffect(() => {
     // Run on client-side only
     FlexpaLink.create({
       // Replace with your publishable key
-      publishableKey: 'pk_test_DPfJED99WVLf1mNAQOCsf_iGxuQh3668qnAEc6FScEA', 
-      onSuccess: (publicToken) => {
+      publishableKey: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY ?? '',
+      onSuccess: (token) => {
         // Send `publicToken` to your backend to exchange it for a patient `access_token`
         // https://www.flexpa.com/docs/sdk/login#exchange
-        console.log('publicToken: ', publicToken)
+        getAccessToken(token)
       }
-    });
+    })
   }, [])
 
   return (
