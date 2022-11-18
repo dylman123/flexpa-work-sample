@@ -17,14 +17,12 @@ export default function Home() {
         // Send `publicToken` to your backend to exchange it for a patient `access_token`
         // https://www.flexpa.com/docs/sdk/login#exchange
         getAccessToken(publicToken)
-          .then(at => {
-            setAccessToken(at)
-          })
+          .then(at => at && setAccessToken(at))
       }
     })
   }, [setAccessToken])
 
-  const getAccessToken = async (pt: string): Promise<string> => {
+  const getAccessToken = async (pt: string): Promise<string | undefined> => {
     // Fixme: sometimes returns a 404 error on /api/auth
     const response = await fetch('/api/auth', {
       method: 'POST',
@@ -34,7 +32,7 @@ export default function Home() {
       },
     })
     const data = await response.json()
-    return data.data.access_token ?? ''
+    return data.data.access_token
   }
 
   console.log({ accessToken })
