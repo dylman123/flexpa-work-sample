@@ -4,6 +4,7 @@ import styles from '../styles/Home.module.css'
 import FlexpaLink from '@flexpa/link'
 import { JsonViewer } from '@textea/json-viewer'
 import { ocean } from '../styles/jsonViewer'
+import { getAccessToken, getPatientId, getExplanationOfBenefit } from '../domain/utils'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
@@ -35,52 +36,10 @@ export default function Home() {
     })
   }, [accessToken, setAccessToken, patientId, setPatientId])
 
-  const getAccessToken = async (pt: string): Promise<string | undefined> => {
-    // Fixme: sometimes returns a 404 error on /api/link/exchange
-    const response = await fetch('/api/link/exchange', {
-      method: 'POST',
-      body: JSON.stringify({ publicToken: pt }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
-    return data.data.access_token
-  }
-
-  const getPatientId = async (at: string): Promise<string | undefined> => {
-    const response = await fetch('/api/link/introspect', {
-      method: 'POST',
-      body: JSON.stringify({ accessToken: at }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
-    const regex = new RegExp('([^\/]+$)')
-    const patientId = data.data.sub && data.data.sub.match(regex)[0]
-    return patientId
-  }
-
-  const getExplanationOfBenefit = async (id: string): Promise<object | undefined> => {
-    const response = await fetch('/api/fhir/ExplanationOfBenefit', {
-      method: 'POST',
-      body: JSON.stringify({
-        patientId: id,
-      }),
-      headers: {
-        'Access-Token': accessToken,
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = await response.json()
-    return data.data
-  }
-
   const handleGetData = () => {
     setPatientData({})
     setPageError(false)
-    getExplanationOfBenefit(patientId)
+    getExplanationOfBenefit(patientId, accessToken)
       .then(d => d && setPatientData(d))
       .then(() => setPageError(false))
       .catch(e => setPageError(true))
