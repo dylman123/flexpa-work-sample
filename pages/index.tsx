@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import FlexpaLink from '@flexpa/link'
+import { ThreeCircles, Hearts, MutatingDots, RotatingTriangles, ColorRing } from 'react-loader-spinner'
 import { JsonViewer } from '@textea/json-viewer'
 import { ocean } from '../styles/jsonViewer'
 import { getAccessToken, getPatientId, getExplanationOfBenefit } from '../domain/utils'
@@ -13,6 +14,7 @@ export default function Home() {
   const [patientId, setPatientId] = useState("")
   const [patientData, setPatientData] = useState({})
   const [pageError, setPageError] = useState(false)
+  const [pageLoading, setPageLoading] = useState(false)
 
   useEffect(() => {
     // Run on client-side only
@@ -22,26 +24,32 @@ export default function Home() {
       onSuccess: (publicToken) => {
         // Send `publicToken` to your backend to exchange it for a patient `access_token`
         // https://www.flexpa.com/docs/sdk/login#exchange
+        setPageLoading(true)
         getAccessToken(publicToken)
           .then(at => {
             at && setAccessToken(at)
             return at && getPatientId(at)
           })
-          .then(id => {
-            id && setPatientId(id)
+          .then(id => id && setPatientId(id))
+          .then(() => {
+            setPageLoading(false)
+            setPageError(false)
           })
-          .then(() => setPageError(false))
           .catch(e => setPageError(true))
       }
     })
-  }, [accessToken, setAccessToken, patientId, setPatientId])
+  }, [])
 
   const handleGetData = () => {
     setPatientData({})
+    setPageLoading(true)
     setPageError(false)
     getExplanationOfBenefit(patientId, accessToken)
       .then(d => d && setPatientData(d))
-      .then(() => setPageError(false))
+      .then(() => {
+        setPageLoading(false)
+        setPageError(false)
+      })
       .catch(e => setPageError(true))
   }
 
@@ -70,15 +78,24 @@ export default function Home() {
         ⚕️
         </h1>
 
-        <p className={styles.description}>
-          To retrieve your data:
-        </p>
-        
+        { pageLoading ? null : (
+          <p className={styles.description}>
+            To retrieve your data:
+          </p>
+        ) }
+
         <br />
 
         <div className={styles.column}>
           <div>
-            { !patientId ? (
+            { pageLoading ? (
+              <ThreeCircles
+                height="80"
+                width="80"
+                color="violet"
+                ariaLabel="loading"
+              />
+            ) : !patientId ? (
               <button onClick={() => FlexpaLink.open()}>1. Link your health payer</button>
             ) : (
               <button onClick={handleGetData}>2. Download your data</button>
