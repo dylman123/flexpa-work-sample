@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@flexpa/link": "^0.0.8",
+    "@textea/json-viewer": "^2.11.1",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",

@@ -1,16 +1,16 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { FormEvent, useEffect, useState } from 'react'
 import FlexpaLink from '@flexpa/link'
+import { JsonViewer } from '@textea/json-viewer'
+import { ocean } from '../styles/jsonViewer'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
 
   const [accessToken, setAccessToken] = useState("")
   const [patientId, setPatientId] = useState("")
   const [patientData, setPatientData] = useState({})
-
-  console.log({ accessToken, patientId })
 
   useEffect(() => {
     // Run on client-side only
@@ -75,6 +75,7 @@ export default function Home() {
   }
 
   const handleGetData = () => {
+    setPatientData({})
     getExplanationOfBenefit(patientId)
       .then(d => d && setPatientData(d))
   }
@@ -106,8 +107,8 @@ export default function Home() {
             ) }
           </div>
           <div>
-            { patientData ? (
-              'show data'
+            { Object.keys(patientData).length !== 0 ? (
+              <JsonViewer value={patientData} theme={ocean}/>
             ) : (
               null
             )}
