@@ -73,6 +73,15 @@
   max-width: 800px;
 }
 
+.column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 800px;
+  gap: 20px;
+}
+
 .card {
   margin: 1rem;
   padding: 1.5rem;

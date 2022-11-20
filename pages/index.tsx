@@ -8,6 +8,9 @@ export default function Home() {
 
   const [accessToken, setAccessToken] = useState("")
   const [patientId, setPatientId] = useState("")
+  const [patientData, setPatientData] = useState({})
+
+  console.log({ accessToken, patientId })
 
   useEffect(() => {
     // Run on client-side only
@@ -20,11 +23,14 @@ export default function Home() {
         getAccessToken(publicToken)
           .then(at => {
             at && setAccessToken(at)
-            at && getPatientId(at)
+            return at && getPatientId(at)
+          })
+          .then(id => {
+            id && setPatientId(id)
           })
       }
     })
-  }, [accessToken, setAccessToken])
+  }, [accessToken, setAccessToken, patientId, setPatientId])
 
   const getAccessToken = async (pt: string): Promise<string | undefined> => {
     // Fixme: sometimes returns a 404 error on /api/link/exchange
@@ -48,29 +54,29 @@ export default function Home() {
       },
     })
     const data = await response.json()
-    console.log({ data })
-    return data.data
+    const regex = new RegExp('([^\/]+$)')
+    const patientId = data.data.sub && data.data.sub.match(regex)[0]
+    return patientId
   }
 
-  const getExplanationOfBenefits = async (id: string) => {
+  const getExplanationOfBenefit = async (id: string): Promise<object | undefined> => {
     const response = await fetch('/api/fhir/ExplanationOfBenefit', {
       method: 'POST',
       body: JSON.stringify({
         patientId: id,
-        accessToken,
       }),
       headers: {
+        'Access-Token': accessToken,
         'Content-Type': 'application/json',
       },
     })
     const data = await response.json()
-    console.log({ data })
-    return data
+    return data.data
   }
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault()
-    getExplanationOfBenefits(patientId)
+  const handleGetData = () => {
+    getExplanationOfBenefit(patientId)
+      .then(d => d && setPatientData(d))
   }
 
   return (
@@ -91,51 +97,21 @@ export default function Home() {
           <code className={styles.code}>pages/index.tsx</code>
         </p>
 
-        <div className={styles.grid}>
-        {/* { accessToken ? (
-          <form onSubmit={handleSubmit}>
-            <label>
-              Enter your Patient ID:{' '}
-              <input
-                type="text"
-                name="patient-id"
-                onChange={(e) => setPatientId(e.target.value)}
-              />
-            </label>{' '}
-            <input type="submit" value="Submit" />
-          </form>
-        ) : ( */}
-          <button onClick={() => FlexpaLink.open()}>Link your health data</button>
-        {/* ) } */}
-          {/* <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a> */}
-
-          {/* <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a> */}
-
-          {/* <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a> */}
-
-          {/* <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a> */}
+        <div className={styles.column}>
+          <div>
+            { patientId ? (
+              <button onClick={handleGetData}>Download your data</button>
+            ) : (
+              <button onClick={() => FlexpaLink.open()}>Link your health data</button>
+            ) }
+          </div>
+          <div>
+            { patientData ? (
+              'show data'
+            ) : (
+              null
+            )}
+          </div>
         </div>
       </main>
 
