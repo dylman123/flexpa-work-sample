@@ -24,7 +24,6 @@ export default function Home() {
       onSuccess: (publicToken) => {
         // Send `publicToken` to your backend to exchange it for a patient `access_token`
         // https://www.flexpa.com/docs/sdk/login#exchange
-        setPageLoading(true)
         getAccessToken(publicToken)
           .then(at => {
             at && setAccessToken(at)
@@ -39,6 +38,12 @@ export default function Home() {
       }
     })
   }, [])
+
+  const handleLinkPayer = () => {
+    setPageLoading(true)
+    setPageError(false)
+    FlexpaLink.open()
+  }
 
   const handleGetData = () => {
     setPatientData({})
@@ -96,7 +101,7 @@ export default function Home() {
                 ariaLabel="loading"
               />
             ) : !patientId ? (
-              <button onClick={() => FlexpaLink.open()}>1. Link your health payer</button>
+              <button onClick={handleLinkPayer}>1. Link your health payer</button>
             ) : (
               <button onClick={handleGetData}>2. Download your data</button>
             ) }
