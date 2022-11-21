@@ -5,7 +5,7 @@ import FlexpaLink from '@flexpa/link'
 import { ThreeCircles, Hearts, MutatingDots, RotatingTriangles, ColorRing } from 'react-loader-spinner'
 import { JsonViewer } from '@textea/json-viewer'
 import { ocean } from '../styles/jsonViewer'
-import { getAccessToken, getPatientId, getExplanationOfBenefit } from '../domain/utils'
+import { getAccessToken, getPatientId, getExplanationOfBenefit } from '../domain/requests'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
