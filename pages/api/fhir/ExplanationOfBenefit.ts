@@ -9,11 +9,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  if (req.method !== 'POST') {
+  if (req.method !== 'GET') {
     res.status(400).json({ data: 'Invalid request method' })
   }
   const accessToken = req.headers['access-token']
-  const { patientId } = req.body
+  const { patient: patientId } = req.query
 
   // Make request to Flexpa API endpoint
   const requestUrl = `https://api.flexpa.com/fhir/ExplanationOfBenefit?patient=${patientId}` 

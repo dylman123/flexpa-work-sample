@@ -18,8 +18,8 @@ export const getPatientId = async (
 ): Promise<string | undefined> => {
     const response = await fetch('/api/link/introspect', {
         method: 'POST',
-        body: JSON.stringify({ accessToken: at }),
         headers: {
+            'Access-Token': at,
             'Content-Type': 'application/json',
         },
     })
@@ -33,11 +33,8 @@ export const getExplanationOfBenefit = async (
     id: string,
     at: string
 ): Promise<object | undefined> => {
-    const response = await fetch('/api/fhir/ExplanationOfBenefit', {
-        method: 'POST',
-        body: JSON.stringify({
-        patientId: id,
-        }),
+    const response = await fetch(`/api/fhir/ExplanationOfBenefit?patient=${id}`, {
+        method: 'GET',
         headers: {
             'Access-Token': at,
             'Content-Type': 'application/json',

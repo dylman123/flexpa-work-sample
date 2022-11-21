@@ -12,7 +12,7 @@ export default async function handler(
   if (req.method !== 'POST') {
     res.status(400).json({ data: 'Invalid request method' })
   }
-  const accessToken: string = req.body.accessToken
+  const accessToken = req.headers['access-token']
 
   // Make request to Flexpa API endpoint
   const flexpaResponse = await fetch('https://api.flexpa.com/link/introspect', {
