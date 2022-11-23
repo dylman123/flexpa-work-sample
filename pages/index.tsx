@@ -24,6 +24,7 @@ export default function Home() {
       onSuccess: (publicToken) => {
         // Send `publicToken` to your backend to exchange it for a patient `access_token`
         // https://www.flexpa.com/docs/sdk/login#exchange
+        // console.log({ publicToken })
         getAccessToken(publicToken)
           .then(at => {
             at && setAccessToken(at)
