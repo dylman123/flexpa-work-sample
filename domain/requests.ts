@@ -10,6 +10,7 @@ export const getAccessToken = async (
         },
     })
     const data = await response.json()
+    // console.log({ at: data.data.access_token })
     return data.data.access_token
 }
 
@@ -26,6 +27,7 @@ export const getPatientId = async (
     const data = await response.json()
     const regex = new RegExp('([^\/]+$)')
     const patientId = data.data.sub && data.data.sub.match(regex)[0]
+    // console.log({ patientId })
     return patientId
 }
 
@@ -41,5 +43,15 @@ export const getExplanationOfBenefit = async (
         },
     })
     const data = await response.json()
+    // console.log({ data })
+    // download(JSON.stringify(data), 'mock-eob.json', 'application/json');
     return data.data
 }
+
+// function download(content: any, fileName: string, contentType: any) {
+//     var a = document.createElement("a");
+//     var file = new Blob([content], {type: contentType});
+//     a.href = URL.createObjectURL(file);
+//     a.download = fileName;
+//     a.click();
+// }
