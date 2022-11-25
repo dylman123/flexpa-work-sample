@@ -8,6 +8,7 @@ export default async function handler(
 ) {
   if (req.method !== 'POST') {
     res.status(400).json({ data: 'Invalid request method' })
+    return
   }
   const publicToken: string = req.body.publicToken
 
